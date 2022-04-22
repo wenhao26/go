@@ -1,0 +1,69 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
+)
+
+type BookTmp struct {
+	BookId     int
+	BookName   string
+	BookNameCn string
+	BookDesc   string
+	Author     string
+	CreateTime int
+}
+
+func main() {
+	dsn := "root:root@tcp(127.0.0.1:3306)/istory_db?charset=utf8&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   "iw_",
+			SingularTable: true,
+		},
+		Logger: logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	/*sqlDB, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Second * 600)*/
+
+	// var bookTmp BookTmp
+	//result := db.First(&bookTmp)
+	//result := db.First(&bookTmp, 1007)
+	//result := db.First(&bookTmp, []int{1007, 1008, 1009})
+	//result := db.First(&bookTmp, "book_id=?", 1008)
+	//fmt.Printf("%#v\n", bookTmp.BookId)
+
+	var bookTmpList []BookTmp
+	//result := db.Limit(1).Find(&bookTmpList)
+	//result := db.Where("book_name=?", "ยั่วสวาทท่านอ๋องโฉมงาม").Limit(1).Find(&bookTmpList)
+	//result := db.Where(map[string]interface{}{"book_name": "ยั่วสวาทท่านอ๋องโฉมงาม"}).Limit(1).Find(&bookTmpList)
+	// result := db.Select("book_id,book_name,author").Limit(10).Find(&bookTmpList)
+	//fmt.Printf("%#v\n", bookTmpList)
+
+	result := db.Debug().Limit(2).Offset(1).Find(&bookTmpList)
+	fmt.Println("Count：", result.RowsAffected)
+	fmt.Println("Error：", errors.Is(result.Error, gorm.ErrRecordNotFound))
+
+	for _, value := range bookTmpList {
+		fmt.Println(value.BookId)
+		fmt.Println(value.BookName)
+		fmt.Println(value.BookNameCn)
+		fmt.Println(value.BookDesc)
+		fmt.Println(value.Author)
+		fmt.Println(value.CreateTime)
+	}
+}

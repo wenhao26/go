@@ -1,0 +1,50 @@
+package main
+
+import (
+	"fmt"
+	"github.com/streadway/amqp"
+	"log"
+	"sync"
+)
+
+var wg sync.WaitGroup
+
+var URI = "amqp://admin:13579abc@119.91.202.245:5672/"
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
+}
+
+func main() {
+	// 建立连接
+	conn, err := amqp.Dial(URI)
+	defer conn.Close()
+	failOnError(err, "连接失败")
+
+	// 创建channel
+	ch, err := conn.Channel()
+	defer ch.Close()
+	failOnError(err, "连接通道失败")
+
+	q, err := ch.QueueDeclare("test.queue", true, false, false, false, nil)
+	failOnError(err, "队列失败")
+
+	wg.Add(1)
+	go func() {
+		for i := 1; i <= 5000000; i++ {
+			fmt.Println("current i=", i)
+
+			body := "test message"
+			err = ch.Publish("", q.Name, false, false, amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        []byte(body),
+			})
+			failOnError(err, "发布失败")
+			log.Printf("[OK] Sent %s", body)
+		}
+		defer wg.Done()
+	}()
+	wg.Wait()
+}

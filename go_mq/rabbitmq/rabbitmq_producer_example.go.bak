@@ -1,0 +1,64 @@
+package main
+
+import (
+	"fmt"
+	"github.com/streadway/amqp"
+	"log"
+)
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
+}
+
+func main() {
+	/*conn, err := amqp.Dial("amqp://admin:13579abc@119.91.202.245:5672/")
+	failOnError(err, "Failed to connect RabbitMQ")
+	//defer conn.Close()
+
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to connect channel")
+	//defer ch.Close()
+
+	q, err := ch.QueueDeclare("test.go.queue", true, false, false, false, nil)
+	failOnError(err, "Failed to declare a queue")
+
+	var body string
+	body += time.Now().Format("2006-01-02 18:18:18")
+	body += ":producer message"
+	err = ch.Publish("test.go.exchange", q.Name, false, false, amqp.Publishing{
+		DeliveryMode: amqp.Persistent, // 消息持久化
+		ContentType:  "text/plain",
+		Body:         []byte(body),
+	})
+	failOnError(err, "Failed to publish a message")
+	log.Printf(" [OK] Send %s", body)*/
+
+	// 连接
+	conn, err := amqp.Dial("amqp://admin:13579abc@1.14.177.49:5672/")
+	failOnError(err, ">>>> 连接服务失败")
+
+	// 建立通道
+	ch, err := conn.Channel()
+	failOnError(err, ">>>> 打开通道失败")
+
+	// 声明队列
+	q, err := ch.QueueDeclare("test.go.queue",true, false, false, false, nil)
+	failOnError(err, ">>>> 未能声明队列")
+
+	// 发布消息
+	//for {
+		msgBody := "test data message"
+		err = ch.Publish("test.go.exchange", q.Name, false, false, amqp.Publishing{
+			DeliveryMode: amqp.Persistent, // 消息持久化
+			ContentType: "text/plain",
+			Body: []byte(msgBody),
+		})
+		log.Printf(" [x] Sent %s", msgBody)
+		failOnError(err, ">>>> 发布消息失败")
+	//}
+
+	fmt.Println("done")
+
+}
