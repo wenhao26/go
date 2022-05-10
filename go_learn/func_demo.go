@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"sync"
 	"time"
+	_ "net/http/pprof"
 )
 
 type Community struct {
@@ -54,4 +56,6 @@ func main() {
 	//asyncLoop(15)
 	var mu MethodUtils
 	mu.matrix(10, 8)
+
+	http.ListenAndServe("0.0.0.0:6060", nil)
 }

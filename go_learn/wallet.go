@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	_ "net/http/pprof"
 )
 
 type Card struct {
@@ -79,6 +81,9 @@ func (card *Card) Menu() {
 }
 
 func main() {
+	//http.ListenAndServe("0.0.0.0:6060", nil)
 	wallet := InitAccount()
 	wallet.Menu()
+
+
 }
