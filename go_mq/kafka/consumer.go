@@ -3,12 +3,18 @@ package main
 import (
 	"fmt"
 	"github.com/Shopify/sarama"
+	"sync"
+	"time"
 )
 
 func main() {
+	var wg sync.WaitGroup
+
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
 	config.Version = sarama.V2_1_1_0
+	config.Consumer.Offsets.AutoCommit.Enable = true
+	config.Consumer.Offsets.AutoCommit.Interval = time.Second * 5
 	config.Consumer.Offsets.Initial = sarama.OffsetNewest
 	client, err := sarama.NewClient([]string{"192.168.7.41:9092", "192.168.7.106:9092", "192.168.7.109:9092"}, config)
 	if err != nil {
@@ -24,7 +30,7 @@ func main() {
 	}
 	defer consumer.Close()
 
-	topic := "test"
+	topic := "dim_valid_wallet_address_test"
 	partitionList, err := consumer.Partitions(topic)
 	if err != nil {
 		fmt.Println("无法获取分区列表：", err)
@@ -40,8 +46,15 @@ func main() {
 		}
 		defer pc.AsyncClose()
 
-		for msg := range pc.Messages() {
-			fmt.Printf("Partition:%d, Offset:%d, Key:%s, Value:%s\n", msg.Partition, msg.Offset, string(msg.Key), string(msg.Value))
-		}
+		wg.Add(1)
+		go func(pc sarama.PartitionConsumer) {
+			defer wg.Done()
+			for msg := range pc.Messages() {
+				fmt.Printf("Partition:%d, Offset:%d, Key:%s, Value:%s\n", msg.Partition, msg.Offset, string(msg.Key), string(msg.Value))
+			}
+		}(pc)
 	}
+
+	wg.Wait()
+	consumer.Close()
 }
