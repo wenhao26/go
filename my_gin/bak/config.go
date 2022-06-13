@@ -1,4 +1,4 @@
-package main
+package bak
 
 const (
 	APP_ID           = "1b2c4074477411ec8fc240b076627a40"

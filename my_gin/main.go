@@ -1,37 +1,13 @@
 package main
 
-import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-)
-
-var headers *Headers
-
-func MiddleWare() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		headers = InitHeaders(c)
-		//params.Header = InitHeaders(c)
-
-		// log.Println(h)
-		//CheckAccessToken(h.AccessToken)
-		//c.Next()
-	}
-}
+import "github.com/gin-gonic/gin"
 
 func main() {
 	r := gin.Default()
-	r.Use(MiddleWare())
-
-	{
-		r.GET("/index", func(c *gin.Context) {
-			c.String(http.StatusOK, "Index")
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
 		})
-		r.POST("/accessToken", func(c *gin.Context) {
-			//CreateToken()
-
-			c.String(http.StatusOK, "accessToken")
-		})
-	}
-
-	r.Run(":8888")
+	})
+	_ = r.Run()
 }
