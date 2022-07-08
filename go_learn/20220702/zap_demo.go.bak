@@ -1,0 +1,10 @@
+package main
+
+func main() {
+	// zap是uber开源的日志库
+	// 它非常的快
+	// 它同时提供了结构化日志记录和printf风格的日志记录
+
+
+
+}

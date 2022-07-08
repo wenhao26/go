@@ -24,7 +24,7 @@ func main() {
 	// res, err := json.Marshal(app)
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 	res, err := json.Marshal(app)
-	
+
 	if err != nil {
 		panic(err)
 	}

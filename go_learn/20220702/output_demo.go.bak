@@ -1,0 +1,75 @@
+package main
+
+import (
+	"fmt"
+	jsoniter "github.com/json-iterator/go"
+)
+
+type Result struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}
+
+type H map[string]interface{}
+
+type Goods struct {
+	Id    int     `json:"id"`
+	Title string  `json:"title"`
+	Price float64 `json:"price"`
+}
+
+func Output(code int, message string, data interface{}) []byte {
+	if data == nil {
+		data = H{}
+	}
+
+	result := Result{}
+	result.Code = code
+	result.Message = message
+	result.Data = data
+
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+	res, err := json.Marshal(result)
+	if err != nil {
+		panic(err)
+	}
+
+	return res
+}
+
+func (g *Goods) InitGoods(id int, title string, price float64) *Goods {
+	g.Id = id
+	g.Title = title
+	g.Price = price
+	return g
+}
+
+func main() {
+	// struct
+	/*var goodsList []Goods
+	for i := 1; i <= 10; i++ {
+		temp := Goods{
+			Id:    i,
+			Title: "title-" + strconv.Itoa(i),
+		}
+		goodsList = append(goodsList, temp)
+	}
+	res := Output(1004, "Ok", goodsList)*/
+
+	// map
+	//var userInfo = make(map[string]interface{})
+	//userInfo["id"] = 666
+	//userInfo["nickname"] = "TestName"
+	/*userInfo := map[string]interface{}{
+		"nickname": "Tom",
+		"age":      18,
+	}
+	res := Output(1004, "Ok", userInfo)*/
+
+	var g Goods
+	goods := g.InitGoods(10047, "diamond exchange product", 299.99)
+	res := Output(1004, "Ok", goods)
+
+	fmt.Println(string(res))
+}
