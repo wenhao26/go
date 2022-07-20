@@ -1,0 +1,35 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+)
+
+type Magick struct {
+	Name string
+}
+
+var (
+	mainInstruct = "magick"
+)
+
+// 识别图片信息
+func ImgInfo(filename string) *Magick {
+	return &Magick{
+		Name: fmt.Sprintf("%s identify %s", mainInstruct, filename),
+	}
+}
+
+// 执行命令
+func (m *Magick) Execute() {
+	fmt.Println(m.Name)
+	cmd := exec.Command(m.Name)
+	cmd.Stdout = os.Stdout
+
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Complete...")
+}

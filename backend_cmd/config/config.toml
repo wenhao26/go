@@ -1,0 +1,2 @@
+amqp_url = "amqp://admin:admin@192.168.7.202:5672/"
+mysql_dsn = "root:root@tcp(127.0.0.1:3306)/coinsky_db?charset=utf8&parseTime=True&loc=Local"
