@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/nsqio/go-nsq"
@@ -31,20 +34,16 @@ func main() {
 		panic(err)
 	}
 
-	//consumer.SetLogger(nil, 0)
+	consumer.SetLogger(nil, 0)
 	consumer.AddHandler(&ConsumerHandler{})
 
 	if err := consumer.ConnectToNSQLookupd("127.0.0.1:4161"); err != nil {
 		panic(err)
 	}
 
-	/*sigChan := make(chan os.Signal, 1)
+	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	<-sigChan*/
-
-	for {
-		time.Sleep(time.Second * 10)
-	}
+	<-sigChan
 
 	consumer.Stop()
 }

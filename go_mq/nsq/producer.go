@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/nsqio/go-nsq"
@@ -16,17 +19,23 @@ func main() {
 
 	topicName := "topic1"
 
-	for {
-		t := time.Now().String()
-		messageBody := []byte("message:" + t)
-		err = producer.Publish(topicName, messageBody)
-		if err != nil {
-			log.Fatal(err)
-		}
+	go func() {
+		for {
+			t := time.Now().String()
+			messageBody := []byte("message:" + t)
+			err = producer.Publish(topicName, messageBody)
+			if err != nil {
+				log.Fatal(err)
+			}
 
-		log.Println("Sent successfully")
-		time.Sleep(time.Millisecond * 1)
-	}
+			log.Println("Sent successfully")
+			time.Sleep(2e9)
+		}
+	}()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
 
 	producer.Stop()
 }
